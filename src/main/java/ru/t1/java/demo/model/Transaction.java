@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -15,8 +16,13 @@ import java.math.BigDecimal;
 @Table(name = "transaction")
 public class Transaction extends AbstractPersistable<Long> {
 
+    private Long accountId;
+
     @Column(name = "amount", precision = 19, scale = 2)
     private BigDecimal amount;
+
+    @Column(name = "dateTime")
+    private Date dateTime;
 
     @Column(name = "client_id")
     private Long clientId;
