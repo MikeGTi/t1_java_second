@@ -1,31 +1,21 @@
 package ru.t1.java.demo.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.t1.java.demo.kafka.KafkaTransactionProducer;
+import ru.t1.java.demo.kafka.producers.KafkaTransactionProducer;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.dto.TransactionDto;
-import ru.t1.java.demo.model.enums.AccountStatus;
-import ru.t1.java.demo.model.enums.TransactionStatus;
 import ru.t1.java.demo.repository.TransactionRepository;
 import ru.t1.java.demo.service.TransactionHandlerService;
-import ru.t1.java.demo.service.TransactionParserService;
 import ru.t1.java.demo.util.TransactionMapper;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

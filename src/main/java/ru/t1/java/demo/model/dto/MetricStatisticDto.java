@@ -6,11 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.t1.java.demo.model.MetricStatistic;
 
 import java.io.Serializable;
 
 /**
- * DTO for {@link ru.t1.java.demo.model.MetricStatisticDto}
+ * DTO for {@link MetricStatistic}
  */
 @Data
 @AllArgsConstructor

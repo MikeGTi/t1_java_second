@@ -1,23 +1,24 @@
-package ru.t1.java.demo.kafka;
+package ru.t1.java.demo.kafka.producers;
+
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import ru.t1.java.demo.model.dto.ClientDto;
+import ru.t1.java.demo.model.dto.TransactionDto;
 
 import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class KafkaClientProducer<T extends ClientDto> {
+public class KafkaTransactionProducer<T extends TransactionDto> {
 
-    private final KafkaTemplate template;
+    private final KafkaTemplate<String, T> template;
 
-    public void send(Long clientId) {
+    public void send(T transactionDto) {
         try {
-            template.sendDefault(UUID.randomUUID().toString(), clientId).get();
+            template.sendDefault(UUID.randomUUID().toString(), transactionDto).get();
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         } finally {
@@ -25,9 +26,9 @@ public class KafkaClientProducer<T extends ClientDto> {
         }
     }
 
-    public void sendTo(String topic, Object o) {
+    public void sendTo(String topic, T transactionDto) {
         try {
-            template.send(topic, o).get();
+            template.send(topic, UUID.randomUUID().toString(), transactionDto).get();
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         } finally {

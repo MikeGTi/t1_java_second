@@ -1,16 +1,13 @@
 package ru.t1.java.demo.util;
 
 import org.springframework.stereotype.Component;
-import ru.t1.java.demo.model.MetricStatisticDto;
+import ru.t1.java.demo.model.MetricStatistic;
 
 @Component
 public class MetricStatisticMapper {
 
-    public static MetricStatisticDto toEntity(ru.t1.java.demo.model.dto.MetricStatisticDto dto) {
-        if (dto.getId() == null) {
-//            throw new NullPointerException();
-        }
-        return MetricStatisticDto.builder()
+    public static MetricStatistic toEntity(ru.t1.java.demo.model.dto.MetricStatisticDto dto) {
+        return MetricStatistic.builder()
                 .executionTime(dto.getExecutionTime())
                 .exceededOnTime(dto.getExceededOnTime())
                 .methodName(dto.getMethodName())
@@ -18,7 +15,7 @@ public class MetricStatisticMapper {
                 .build();
     }
 
-    public static ru.t1.java.demo.model.dto.MetricStatisticDto toDto(MetricStatisticDto entity) {
+    public static ru.t1.java.demo.model.dto.MetricStatisticDto toDto(MetricStatistic entity) {
         return ru.t1.java.demo.model.dto.MetricStatisticDto.builder()
                 .id(entity.getId())
                 .executionTime(entity.getExecutionTime())

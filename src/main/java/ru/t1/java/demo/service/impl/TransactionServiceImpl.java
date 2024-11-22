@@ -97,11 +97,11 @@ public class TransactionServiceImpl implements GenericService<Transaction>, Tran
     @Transactional
     @LogDataSourceError
     public Transaction addTransaction(Transaction transaction) throws AccountException {
-        Account account = accountService.findById(transaction.getAccount().getId());
-        log.info("Balance of account id {} was {}", account.getId(), account.getBalance());
+        Account account = accountService.findById(transaction.getAccountUuid());
+        log.info("Balance of account id {} was {}", account.getAccountUuid(), account.getBalance());
         log.info("New transaction has amount {}", transaction.getAmount());
         account.setBalance(account.getBalance().add(transaction.getAmount()));
-        log.info("New balance of account id {} are {} ", account.getId(), account.getBalance());
+        log.info("New balance of account id {} are {} ", account.getAccountUuid(), account.getBalance());
         return transactionRepository.save(transaction);
     }
 
@@ -113,7 +113,7 @@ public class TransactionServiceImpl implements GenericService<Transaction>, Tran
             throw new TransactionException(String.format("Transaction with id %s is not exists", transactionId));
         }
 
-        Account account = accountService.findById(transactionToUpdate.get().getAccountId());
+        Account account = accountService.findById(transactionToUpdate.get().getAccountUuid());
 
         transactionToUpdate.get().setAmount(transactionDto.getAmount());
         transactionToUpdate.get().setTime(transactionDto.getTimestamp());

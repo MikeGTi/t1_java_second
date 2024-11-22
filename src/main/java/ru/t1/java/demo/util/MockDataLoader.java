@@ -44,13 +44,18 @@ public class MockDataLoader {
     @Value("${t1.mock-data.transaction-file-path}")
     private String transactionFilePath;
 
+    @Value("${t1.mock-data.full-data-file-path}")
+    private String fullDataFilePath;
+
     /*@PostConstruct
     void init() {
         if (clientRepository.count() == 0) {
             try {
-                loadData(transactionFilePath);
+                log.info("Loading data from {}", fullDataFilePath);
+                loadData(fullDataFilePath);
+                *//*loadData(transactionFilePath);
                 loadData(accountFilePath);
-                loadData(clientFilePath);
+                loadData(clientFilePath);*//*
             } catch (IOException e) {
                 log.error("Load data error", e);
             }
@@ -80,9 +85,9 @@ public class MockDataLoader {
 
     public DataSourceErrorLog generateDataSourceErrorLog() {
         DataSourceErrorLog errorLog = new DataSourceErrorLog();
-        errorLog.setMethodSignature("ru.t1.example.anyService.methodWithError");
-        errorLog.setMessage("Any type error");
-        errorLog.setStackTrace("Stack trace of the error");
-        return errorLog;
+                           errorLog.setMethodSignature("ru.t1.example.anyService.methodWithError");
+                           errorLog.setMessage("Any type error");
+                           errorLog.setStackTrace("Stack trace of the error");
+                    return errorLog;
     }
 }

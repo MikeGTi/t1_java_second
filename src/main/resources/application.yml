@@ -52,10 +52,11 @@ t1:
     perform-period-min-ms: 5000
 
   mock-data:
-    client-file-path: /mock_data/account/client.json
-    account-file-path: /mock_data/account/account.json
-    transaction-file-path: /mock_data/transaction/transaction.json
-    add-objects-counter: 1000
+    client-file-path: mock_data/account/client.json
+    account-file-path: mock_data/account/account.json
+    transaction-file-path: mock_data/transaction/transaction.json
+    full-data-file-path: mock_data/full_mock_data.json
+    add-objects-counter: 100
 
 track:
   errors-to-track: JsonParseException, IOException

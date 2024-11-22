@@ -1,4 +1,4 @@
-package ru.t1.java.demo.kafka;
+package ru.t1.java.demo.kafka.consumers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

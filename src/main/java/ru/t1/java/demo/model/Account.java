@@ -19,13 +19,12 @@ import java.util.Set;
 public class Account {
 
     @Id
-    @SequenceGenerator(name = "account_generator", sequenceName = "account_seq", allocationSize = 50)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "account_uuid")
+    private Long accountUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "client_uuid")
     private Client client;
 
     @Column(name = "account_type")

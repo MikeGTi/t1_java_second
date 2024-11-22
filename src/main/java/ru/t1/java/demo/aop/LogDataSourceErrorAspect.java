@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.*;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
-import ru.t1.java.demo.kafka.KafkaLogDataSourceErrorProducer;
+import ru.t1.java.demo.kafka.producers.KafkaLogDataSourceErrorProducer;
 import ru.t1.java.demo.model.DataSourceErrorLog;
 import ru.t1.java.demo.repository.DataSourceErrorLogRepository;
 

@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import ru.t1.java.demo.kafka.KafkaMetricsProducer;
+import ru.t1.java.demo.kafka.producers.KafkaMetricsProducer;
 import ru.t1.java.demo.model.dto.MetricStatisticDto;
 import java.util.Arrays;
 
@@ -31,7 +31,7 @@ public class MetricAspect {
         log.info("Вызов метода: {}", pJoinPoint.getSignature().toShortString());
 
         long beforeTime = System.currentTimeMillis();
-        Object result = null;
+        Object result;
 
         try {
             result = pJoinPoint.proceed();

@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,10 +17,9 @@ import java.util.List;
 public class Client {
 
     @Id
-    @SequenceGenerator(name = "client_generator", sequenceName = "client_seq", allocationSize = 50)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_seq")
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "client_uuid")
+    private UUID clientUuid;
 
     @Column(name = "first_name")
     private String firstName;

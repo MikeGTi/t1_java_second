@@ -13,7 +13,9 @@ import ru.t1.java.demo.model.enums.AccountType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 
 /**
  * DTO for {@link ru.t1.java.demo.model.Account}
@@ -24,24 +26,24 @@ import java.util.List;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountDto implements Serializable {
-    private Long id;
+    @JsonProperty("account_uuid")
+    Long accountUuid;
 
-    @JsonProperty("client_id")
-    private Long clientId;
+    @JsonProperty("client_uuid")
+    UUID clientUuid;
 
     @JsonProperty("account_type")
-    @Enumerated(EnumType.STRING)
-    private AccountType accountType;
+    AccountType accountType;
 
     @JsonProperty("status")
-    private AccountStatus status;
+    AccountStatus status;
 
     @JsonProperty("balance")
-    private BigDecimal balance;
+    BigDecimal balance;
 
     @JsonProperty("frozen_amount")
-    private BigDecimal frozenAmount;
+    BigDecimal frozenAmount;
 
     @JsonProperty("transactions")
-    private List<TransactionDto> transactions;
+    Set<TransactionDto> transactions;
 }
