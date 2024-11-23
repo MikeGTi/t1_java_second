@@ -20,7 +20,7 @@ import java.util.UUID;
 @Component
 public class KafkaLogDataSourceErrorProducer<T extends DataSourceErrorLog> {
 
-    private final KafkaTemplate template;
+    private final KafkaTemplate<String, T> template;
 
     @Value("${t1.kafka.topic.data-source-errors}")
     private String topic;
@@ -28,19 +28,21 @@ public class KafkaLogDataSourceErrorProducer<T extends DataSourceErrorLog> {
     @Value("${t1.kafka.topic.header.data-source-errors-header}")
     private String header;
 
-    public boolean send(DataSourceErrorLog err) {
-        boolean rsl = Boolean.TRUE;
+    public void send(T err) throws Exception {
         try {
             List<Header> headers = List.of(new RecordHeader(header, header.getBytes(StandardCharsets.UTF_8)));
-            ProducerRecord<String, DataSourceErrorLog> record = new ProducerRecord<>(topic, null, null, UUID.randomUUID().toString(), err, headers);
-            template.send(topic, record).get();
-        } catch (Exception exception) {
-            rsl = Boolean.FALSE;
-            log.error(exception.getMessage(), exception);
+            ProducerRecord<String, T> record = new ProducerRecord<>(topic, null, UUID.randomUUID().toString(), err, headers);
+            template.setDefaultTopic(topic);
+            template.send(record).get();
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            throw new Exception(ex);
         } finally {
             template.flush();
         }
-        return rsl;
+
+
+
     }
 
 }
