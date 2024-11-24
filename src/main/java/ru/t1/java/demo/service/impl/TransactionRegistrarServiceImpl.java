@@ -12,17 +12,16 @@ import ru.t1.java.demo.model.dto.TransactionDto;
 import ru.t1.java.demo.model.enums.AccountStatus;
 import ru.t1.java.demo.model.enums.TransactionStatus;
 import ru.t1.java.demo.repository.TransactionRepository;
-import ru.t1.java.demo.service.TransactionRegistrarService;
+import ru.t1.java.demo.service.RegistrarService;
 import ru.t1.java.demo.util.TransactionMapper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TransactionRegistrarServiceImpl implements TransactionRegistrarService {
+public class TransactionRegistrarServiceImpl implements RegistrarService<Transaction> {
+
     @Value("${t1.kafka.topic.transaction-accept}")
     private String transactionAcceptedTopic;
 
@@ -31,28 +30,36 @@ public class TransactionRegistrarServiceImpl implements TransactionRegistrarServ
     private final TransactionMapper transactionMapper;
 
     private final KafkaTransactionProducer<TransactionDto> producer;
-    private Map<Long, Account> cache = new HashMap<>();
-
+    private Map<UUID, Account> cache = new HashMap<>();
 
     @Transactional
     @Override
-    public void register(List<Transaction> transactions) {
+    public void register(Iterable<Transaction> entities) {
         // filter & set Transactions
-        transactions.stream()
+        List<Transaction> transactionList = new ArrayList<>();
+
+        entities.forEach(transaction -> {
+            if(accountService.findByUuid(transaction.getAccountUuid()).getStatus().equals(AccountStatus.OPEN))  {
+                transactionList.add(transaction);
+            }
+        });
+
+        transactionList.stream()
                 .filter(transaction ->
-                        accountService.getAccountById(transaction.getAccountUuid()).getStatus().equals(AccountStatus.OPEN))
+                        accountService.findByUuid(transaction.getAccountUuid())
+                                      .getStatus()
+                                      .equals(AccountStatus.OPEN))
                 .forEach(transaction -> transaction.setStatus(TransactionStatus.REQUESTED));
 
-        transactionRepository.saveAllAndFlush(transactions);
 
         // collect Accounts
-        List<Long> accountsIds = transactions.stream().map(Transaction::getAccountUuid).toList();
-        List<Account> accounts = accountService.getAccountsById(accountsIds);
+        List<UUID> accountsUuids = transactionList.stream().map(Transaction::getAccountUuid).toList();
+        List<Account> accounts = accountsUuids.stream().map(accountService::findByUuid).toList();
 
         accounts.forEach(account -> cache.putIfAbsent(account.getAccountUuid(), account));
 
         // handle Accounts balance
-        transactions.forEach(transaction -> {
+        transactionList.forEach(transaction -> {
             // set new balance
             Account account = cache.get(transaction.getAccountUuid());
             account.setBalance(account.getBalance().add(transaction.getAmount()));
@@ -60,6 +67,6 @@ public class TransactionRegistrarServiceImpl implements TransactionRegistrarServ
             producer.sendTo(transactionAcceptedTopic, transactionMapper.toDto(transaction));
         });
 
+        transactionRepository.saveAllAndFlush(transactionList);
     }
-
 }

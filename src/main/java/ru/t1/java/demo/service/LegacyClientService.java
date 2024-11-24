@@ -25,7 +25,7 @@ public class LegacyClientService {
     }
 
     public ClientDto getClient(Long id) {
-        log.debug("Call method getClient with id {}", id);
+        log.debug("Call method getClient with uuid {}", id);
         ClientDto clientDto = null;
 
         if (cache.containsKey(id)) {

@@ -6,12 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.kafka.producers.KafkaLogDataSourceErrorProducer;
 import ru.t1.java.demo.model.DataSourceErrorLog;
 import ru.t1.java.demo.repository.DataSourceErrorLogRepository;
 
 import java.util.Arrays;
+
 
 @Slf4j
 @Aspect
@@ -40,12 +42,12 @@ public class LogDataSourceErrorAspect {
 
         try {
             producer.send(dataSourceError);
-        } catch (Exception e1) {
-            log.error("Advice logDataSourceErrorAdvice: Send message exception: {}", e1.toString());
+        } catch (Exception exception) {
+            log.error("Advice logDataSourceErrorAdvice: Send message exception: {}", exception.toString());
             try {
                 repository.saveAndFlush(dataSourceError);
-            } catch (Exception e2) {
-                log.error("Advice logDataSourceErrorAdvice: Data source exception: {}", e2.toString());
+            } catch (DataAccessException dataAccessException) {
+                log.error("Advice logDataSourceErrorAdvice: Data access exception: {}", dataAccessException.toString());
             }
         }
     }

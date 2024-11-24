@@ -30,9 +30,9 @@ public class KafkaLogDataSourceErrorProducer<T extends DataSourceErrorLog> {
 
     public void send(T err) throws Exception {
         try {
+            template.setDefaultTopic(topic);
             List<Header> headers = List.of(new RecordHeader(header, header.getBytes(StandardCharsets.UTF_8)));
             ProducerRecord<String, T> record = new ProducerRecord<>(topic, null, UUID.randomUUID().toString(), err, headers);
-            template.setDefaultTopic(topic);
             template.send(record).get();
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
@@ -40,9 +40,5 @@ public class KafkaLogDataSourceErrorProducer<T extends DataSourceErrorLog> {
         } finally {
             template.flush();
         }
-
-
-
     }
-
 }

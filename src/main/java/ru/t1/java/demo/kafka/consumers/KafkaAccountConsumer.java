@@ -8,7 +8,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.dto.AccountDto;
-import ru.t1.java.demo.service.AccountService;
+import ru.t1.java.demo.service.impl.AccountServiceImpl;
 import ru.t1.java.demo.util.AccountMapper;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 public class KafkaAccountConsumer {
 
-    private final AccountService accountService;
+    private final AccountServiceImpl accountServiceImpl;
     private final AccountMapper accountMapper;
 
 
@@ -33,7 +33,7 @@ public class KafkaAccountConsumer {
             List<Account> accounts = messageList.stream()
                                                 .map(accountMapper::toEntity)
                                                 .toList();
-            accountService.registerAccounts(accounts);
+            accountServiceImpl.register(accounts);
         } finally {
             ack.acknowledge();
         }

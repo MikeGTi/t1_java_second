@@ -8,7 +8,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.dto.TransactionDto;
-import ru.t1.java.demo.service.TransactionRegistrarService;
+import ru.t1.java.demo.service.impl.TransactionRegistrarServiceImpl;
 import ru.t1.java.demo.util.TransactionMapper;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 public class KafkaTransactionConsumer {
 
-    private final TransactionRegistrarService transactionService;
+    private final TransactionRegistrarServiceImpl transactionRegistrarService;
     private final TransactionMapper transactionMapper;
 
     @KafkaListener(id = "${t1.kafka.topic.transaction-registration}",
@@ -33,7 +33,7 @@ public class KafkaTransactionConsumer {
             List<Transaction> transactions = messageList.stream()
                                                         .map(transactionMapper::toEntity)
                                                         .toList();
-            transactionService.register(transactions);
+            transactionRegistrarService.register(transactions);
         } finally {
             ack.acknowledge();
         }

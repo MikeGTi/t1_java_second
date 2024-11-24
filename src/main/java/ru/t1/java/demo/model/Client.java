@@ -14,10 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "client")
-public class Client {
+public class Client extends AbstractPersistable<Long> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "client_uuid")
     private UUID clientUuid;
 
