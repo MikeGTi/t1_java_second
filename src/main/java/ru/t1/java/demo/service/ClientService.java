@@ -8,28 +8,36 @@ import ru.t1.java.demo.model.Client;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 public interface ClientService {
-    List<Client> parseJson() throws IOException;
-
-    void registerClients(List<Client> clients);
-
-    Client findById(Long clientId);
 
     List<Client> findAll();
 
-    Client save(Client entity);
-
     @LogDataSourceError
-    void delete(Long clientId) throws ClientException;
+    @Transactional(readOnly = true)
+    Client findByClientUuid(UUID clientUuid) throws ClientException;
+
+    @Transactional(readOnly = true)
+    @LogDataSourceError
+    Client findByAccountUuid(UUID accountUuid);
 
     @LogDataSourceError
     @Transactional(readOnly = true)
-    List<Account> findAccountsByClientId(Long clientId) throws ClientException;
+    List<Account> findAccountsByClientUuid(UUID clientUuid) throws ClientException;
 
     @LogDataSourceError
-    Client updateClient(Long clientId, Client clientDetails) throws ClientException;
-
+    @Transactional
     Client createClient(Client entity);
 
+    @LogDataSourceError
+    Client updateClient(UUID clientUuid, Client clientDto) throws ClientException;
+
+    @LogDataSourceError
+    @Transactional
+    Client saveClient(Client entity);
+
+    @LogDataSourceError
+    @Transactional
+    void deleteClient(UUID clientUuid) throws ClientException;
 }

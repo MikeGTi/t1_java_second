@@ -16,6 +16,7 @@ import ru.t1.java.demo.util.TransactionMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -35,7 +36,7 @@ public class TransactionHandlerServiceImpl implements TransactionHandlerService 
     private final KafkaTransactionProducer<TransactionDto> producer;
     private final TransactionMapper transactionMapper;
 
-    private Map<Long, Account> cache = new HashMap<>();
+    private Map<UUID, Account> cache = new HashMap<>();
 
     @Transactional
     @Override
@@ -55,15 +56,15 @@ public class TransactionHandlerServiceImpl implements TransactionHandlerService 
         transactionRepository.saveAllAndFlush(transactions);
 
         // collect Accounts
-        List<Long> accountsIds = transactions.stream().map(Transaction::getAccountId).toList();
-        List<Account> accounts = accountService.getAccountsById(accountsIds);
+        List<UUID> accountsUuids = transactions.stream().map(Transaction::getAccountUuid).toList();
+        List<Account> accounts = accountsUuids.stream().map(accountService::findByUuid).toList();
 
-        accounts.forEach(account -> cache.putIfAbsent(account.getId(), account));
+        accounts.forEach(account -> cache.putIfAbsent(account.getAccountUuid(), account));
 
         // handle Accounts balance
         transactions.forEach(transaction -> {
             // set new balance
-            Account account = cache.get(transaction.getAccountId());
+            Account account = cache.get(transaction.getAccountUuid());
             account.setBalance(account.getBalance().add(transaction.getAmount()));
             // messaging
             producer.sendTo(transactionAcceptedTopic, transactionMapper.toDto(transaction));

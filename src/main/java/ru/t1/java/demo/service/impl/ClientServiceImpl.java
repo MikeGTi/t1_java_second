@@ -1,7 +1,6 @@
 package ru.t1.java.demo.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,8 @@ import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.ClientRepository;
 import ru.t1.java.demo.service.ClientService;
+import ru.t1.java.demo.service.ParserService;
+import ru.t1.java.demo.service.RegistrarService;
 import ru.t1.java.demo.util.ClientMapper;
 
 import java.io.File;
@@ -21,12 +22,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ClientServiceImpl implements ClientService {
+public class ClientServiceImpl implements ClientService, ParserService<Client>, RegistrarService<Client> {
 
     private final ClientRepository clientRepository;
     private final AccountRepository accountRepository;
@@ -58,10 +60,9 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void registerClients(List<Client> clients) {
+    public void register(Iterable<Client> clients) {
         clientRepository.saveAllAndFlush(clients);
     }
-
 
     public Client createClient(Client client) {
         return clientRepository.save(client);
@@ -70,12 +71,31 @@ public class ClientServiceImpl implements ClientService {
     @Transactional(readOnly = true)
     @LogDataSourceError
     @Override
-    public Client findById(Long id) {
-        Optional<Client> client = clientRepository.findById(id);
+    public Client findByClientUuid(UUID clientUuid) {
+        Optional<Client> client = Optional.ofNullable(clientRepository.findByClientUuid(clientUuid));
         if (client.isEmpty()) {
-            throw new ClientException(String.format("Client with id %s is not exists", id));
+            throw new ClientException(String.format("Client with uuid %s is not exists", clientUuid));
         }
         return client.get();
+    }
+
+    @Transactional(readOnly = true)
+    @LogDataSourceError
+    @Override
+    public Client findByAccountUuid(UUID accountUuid) {
+        Optional<Client> client = Optional.ofNullable(clientRepository.findByClientUuid(accountUuid));
+        if (client.isEmpty()) {
+            throw new ClientException(String.format("Account with uuid %s is not exists", accountUuid));
+        }
+        return client.get();
+    }
+    
+    @LogDataSourceError
+    @Transactional(readOnly = true)
+    @Override
+    public List<Account> findAccountsByClientUuid(UUID clientUuid) throws ClientException{
+        Client client = clientRepository.findByClientUuid(clientUuid);
+        return accountRepository.findAllByClient(client);
     }
 
     @Transactional(readOnly = true)
@@ -85,7 +105,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client save(Client entity) {
+    public Client saveClient(Client entity) {
         entity.getAccounts().forEach(account -> {
                 account.setClient(entity);
                 account.getTransactions().forEach(transaction -> transaction.setAccount(account));
@@ -95,25 +115,17 @@ public class ClientServiceImpl implements ClientService {
 
     @LogDataSourceError
     @Override
-    public void delete(Long clientId) throws ClientException {
-        Optional<Client> client = clientRepository.findById(clientId);
+    public void deleteClient(UUID clientUuid) throws ClientException {
+        Optional<Client> client = Optional.ofNullable(clientRepository.findByClientUuid(clientUuid));
         client.ifPresent(clientRepository::delete);
     }
 
     @LogDataSourceError
-    @Transactional(readOnly = true)
     @Override
-    public List<Account> findAccountsByClientId(Long clientId) throws ClientException{
-               clientRepository.findById(clientId);
-        return accountRepository.findAllAccountsByClientId(clientId);
-    }
-
-    @LogDataSourceError
-    @Override
-    public Client updateClient(Long clientId, Client clientDto) throws ClientException{
-        Optional<Client>  client = clientRepository.findById(clientId);
+    public Client updateClient(UUID clientUuid, Client clientDto) throws ClientException{
+        Optional<Client>  client = Optional.ofNullable(clientRepository.findByClientUuid(clientUuid));
         if(client.isEmpty()) {
-            throw new ClientException(String.format("Client with id %s is not exists", clientId));
+            throw new ClientException(String.format("Client with uuid %s is not exists", clientUuid));
         }
 
         client.get().setFirstName(clientDto.getFirstName());
@@ -123,4 +135,5 @@ public class ClientServiceImpl implements ClientService {
 
         return clientRepository.save(client.get());
     }
+
 }

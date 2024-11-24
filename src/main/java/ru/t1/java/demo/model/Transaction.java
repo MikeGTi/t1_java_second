@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.t1.java.demo.model.enums.TransactionStatus;
 
@@ -21,19 +22,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tbl_transaction")
-public class Transaction {
+public class Transaction extends AbstractPersistable<Long> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "transaction_uuid")
-    private UUID uuid;
+    private UUID transactionUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_uuid")
+    @JoinColumn(name = "account_id")
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_uuid")
+    @JoinColumn(name = "client_id")
     private Client client;
 
     @Column(name = "amount", precision = 19, scale = 2)
@@ -43,18 +42,16 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
-    @Column(name = "transaction_time")
-    private Timestamp timestamp;
-
+    @Column(name = "created")
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime time = LocalDateTime.now();
+    private LocalDateTime created = LocalDateTime.now();
 
-    public Long getAccountUuid() {
+    public UUID getAccountUuid() {
         return account.getAccountUuid();
     }
 
-    public Long getClientUuid() {
+    public UUID getClientUuid() {
         return client.getClientUuid();
     }
 
@@ -66,7 +63,7 @@ public class Transaction {
         Class<?> thisEffectiveClass = this instanceof HibernateProxy proxy ? proxy.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
         Transaction that = (Transaction) o;
-        return getUuid() != null && Objects.equals(getUuid(), that.getUuid());
+        return getTransactionUuid() != null && Objects.equals(getTransactionUuid(), that.getTransactionUuid());
     }
 
     @Override

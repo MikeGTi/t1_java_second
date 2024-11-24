@@ -3,16 +3,22 @@ package ru.t1.java.demo.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.t1.java.demo.model.Account;
+import ru.t1.java.demo.model.Client;
+import ru.t1.java.demo.model.Transaction;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, UUID> {
 
-    Optional<Account> findById(Long accountId);
+    Account findById(Long accountId);
 
-    List<Account> findAllById(Iterable<Long> accountIds);
+    Account findByAccountUuid(UUID accountUuid);
 
-    List<Account> findAllAccountsByClientId(Long clientId);
+    List<Account> findAllByClient(Client client);
+
+    @Override
+    <S extends Account> List<S> saveAllAndFlush(Iterable<S> accounts);
 }

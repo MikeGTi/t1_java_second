@@ -2,8 +2,6 @@ package ru.t1.java.demo.util;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.t1.java.demo.exception.AccountException;
-import ru.t1.java.demo.exception.ClientException;
 import ru.t1.java.demo.exception.TransactionException;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Client;
@@ -13,6 +11,7 @@ import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.ClientRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Component
@@ -23,31 +22,31 @@ public class TransactionMapper {
     private final ClientRepository clientRepository;
 
     public Transaction toEntity(TransactionDto dto) throws TransactionException {
-        Long accountUuid = dto.getAccountUuid();
-        Optional<Account> account = accountRepository.findById(accountUuid);
+        UUID accountUuid = dto.getAccountUuid();
+        Optional<Account> account = Optional.ofNullable(accountRepository.findByAccountUuid(accountUuid));
         if (account.isEmpty()) {
-            throw new TransactionException(String.format("Account with id %s is not exists", accountUuid));
+            throw new TransactionException(String.format("Account with uuid %s is not exists", accountUuid));
         }
-        Long clientUuid = dto.getClientUuid();
-        Optional<Client> client = clientRepository.findById(clientUuid);
+        UUID clientUuid = dto.getClientUuid();
+        Optional<Client> client = Optional.ofNullable(clientRepository.findByClientUuid(clientUuid));
         if (client.isEmpty()) {
-            throw new TransactionException(String.format("Client with id %s is not exists", clientUuid));
+            throw new TransactionException(String.format("Client with uuid %s is not exists", clientUuid));
         }
         return Transaction.builder()
-                .uuid(dto.getUuid())
+                .transactionUuid(dto.getTransactionUuid())
                 .account(account.get())
                 .client(client.get())
                 .amount(dto.getAmount())
                 .status(dto.getStatus())
-                .time(dto.getTimestamp())
+                .created(dto.getCreated())
                 .build();
     }
 
     public TransactionDto toDto(Transaction entity) {
         return TransactionDto.builder()
-                .uuid(entity.getUuid())
+                .transactionUuid(entity.getTransactionUuid())
                 .amount(entity.getAmount())
-                .timestamp(entity.getTime())
+                .created(entity.getCreated())
                 .accountUuid(entity.getAccount().getAccountUuid())
                 .build();
     }
