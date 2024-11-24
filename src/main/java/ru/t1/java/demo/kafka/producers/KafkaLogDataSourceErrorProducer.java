@@ -7,12 +7,14 @@ import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.model.DataSourceErrorLog;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 @Slf4j
@@ -33,7 +35,7 @@ public class KafkaLogDataSourceErrorProducer<T extends DataSourceErrorLog> {
             template.setDefaultTopic(topic);
             List<Header> headers = List.of(new RecordHeader(header, header.getBytes(StandardCharsets.UTF_8)));
             ProducerRecord<String, T> record = new ProducerRecord<>(topic, null, UUID.randomUUID().toString(), err, headers);
-            template.send(record);
+            template.send(record).get();
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             throw new Exception(ex);
