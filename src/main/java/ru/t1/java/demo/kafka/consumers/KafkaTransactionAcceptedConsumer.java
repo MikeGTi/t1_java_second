@@ -8,7 +8,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.dto.TransactionDto;
-import ru.t1.java.demo.service.impl.transactionSecondServiceImpl;
+import ru.t1.java.demo.service.impl.TransactionSecondServiceImpl;
 import ru.t1.java.demo.util.TransactionMapper;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 public class KafkaTransactionAcceptedConsumer<T extends TransactionDto> {
 
-    private final transactionSecondServiceImpl transactionSecondService;
+    private final TransactionSecondServiceImpl transactionSecondService;
     private final TransactionMapper transactionMapper;
 
     @KafkaListener(id = "${t1.kafka.topic.transaction-accept}",

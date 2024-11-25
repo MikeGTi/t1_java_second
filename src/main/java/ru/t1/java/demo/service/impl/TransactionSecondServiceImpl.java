@@ -20,7 +20,7 @@ import java.util.*;
 /**
  * Task 3 Service 2 (accounts cached):<p>
  * - listen messages from transactions accepted topic;<p>
- * - set status;<p>
+ * - set transaction status;<p>
  * - send messages to result transactions topic;<p>
  **/
 
@@ -30,7 +30,7 @@ import java.util.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class transactionSecondServiceImpl implements HandleService<Transaction> {
+public class TransactionSecondServiceImpl implements HandleService<Transaction> {
 
     @Value("${t1.kafka.topic.transaction-result}")
     private String topicToSend;
@@ -38,7 +38,6 @@ public class transactionSecondServiceImpl implements HandleService<Transaction> 
     @Value("${t1.transaction.perform-period-min-ms}")
     private Period blockPeriod;
 
-    private final AccountServiceImpl accountService;
     private final TransactionRepository transactionRepository;
     private final KafkaJsonMessageProducer producer;
 
@@ -55,9 +54,14 @@ public class transactionSecondServiceImpl implements HandleService<Transaction> 
                  if (balance.add(transaction.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
                      transaction.setStatus(TransactionStatus.REJECTED);
                  } else if (list.size() > 1) {
-                     transaction.setStatus(TransactionStatus.BLOCKED);
+                     list.forEach(t -> {
+                                         t.setStatus(TransactionStatus.BLOCKED);
+                                         String message = buildJsonMessage(t, t.getAccount());
+                                         producer.sendTo(topicToSend, message);
+                     });
                  } else {
-                     // might be set new balance?
+                     Account account = transaction.getAccount();
+                     account.setBalance(account.getBalance().add(transaction.getAmount()));
                      transaction.setStatus(TransactionStatus.ACCEPTED);
                  }
             }
@@ -69,7 +73,7 @@ public class transactionSecondServiceImpl implements HandleService<Transaction> 
             producer.sendTo(topicToSend, message);
         });
 
-        transactionRepository.saveAllAndFlush(entities);
+        //transactionRepository.saveAllAndFlush(entities);
     }
 
     private String buildJsonMessage(Transaction transaction, Account account) {
