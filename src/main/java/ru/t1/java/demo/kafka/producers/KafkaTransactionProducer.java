@@ -35,5 +35,4 @@ public class KafkaTransactionProducer<T extends TransactionDto> {
             template.flush();
         }
     }
-
 }

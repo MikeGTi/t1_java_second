@@ -8,7 +8,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.dto.TransactionDto;
-import ru.t1.java.demo.service.impl.TransactionRegistrarServiceImpl;
+import ru.t1.java.demo.service.impl.TransactionFirstServiceImpl;
 import ru.t1.java.demo.util.TransactionMapper;
 
 import java.util.List;
@@ -17,27 +17,26 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class KafkaTransactionConsumer {
+public class KafkaTransactionConsumer<T extends TransactionDto> {
 
-    private final TransactionRegistrarServiceImpl transactionRegistrarService;
+    private final TransactionFirstServiceImpl transactionRegistrarService;
     private final TransactionMapper transactionMapper;
 
     @KafkaListener(id = "${t1.kafka.topic.transaction-registration}",
                    topics = "${t1.kafka.topic.transaction-registration}",
                    containerFactory = "kafkaListenerContainerFactory")
-    public void listener(@Payload List<TransactionDto> messageList,
-                                      Acknowledgment ack) {
+    public void listener(@Payload List<T> messageList,
+                                  Acknowledgment ack) {
 
         log.debug("Transaction consumer: Обработка новых сообщений");
         try {
             List<Transaction> transactions = messageList.stream()
-                                                        .map(transactionMapper::toEntity)
-                                                        .toList();
+                                              .map(transactionMapper::toEntity)
+                                              .toList();
             transactionRegistrarService.register(transactions);
         } finally {
             ack.acknowledge();
         }
         log.debug("Transaction consumer: записи обработаны");
-
     }
 }

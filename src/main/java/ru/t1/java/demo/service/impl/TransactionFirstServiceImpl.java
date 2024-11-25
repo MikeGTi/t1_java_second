@@ -5,22 +5,33 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.t1.java.demo.kafka.producers.KafkaTransactionProducer;
+import ru.t1.java.demo.kafka.producers.KafkaJsonMessageProducer;
 import ru.t1.java.demo.model.Account;
+import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.Transaction;
-import ru.t1.java.demo.model.dto.TransactionDto;
 import ru.t1.java.demo.model.enums.AccountStatus;
 import ru.t1.java.demo.model.enums.TransactionStatus;
 import ru.t1.java.demo.repository.TransactionRepository;
 import ru.t1.java.demo.service.RegistrarService;
+import ru.t1.java.demo.util.AccountMapper;
 import ru.t1.java.demo.util.TransactionMapper;
 
 import java.util.*;
 
+/**
+ * Task 3 Service 1 (accounts cached):<p>
+ * - listen messages from transactions topic;<p>
+ * - setup status;<p>
+ * - set account balance;<p>
+ * - send messages to accepted transactions topic;
+ **/
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TransactionRegistrarServiceImpl implements RegistrarService<Transaction> {
+public class TransactionFirstServiceImpl implements RegistrarService<Transaction> {
+
+    @Value("${t1.kafka.topic.transaction-registration}")
+    private String transactionToRegistrationTopic;
 
     @Value("${t1.kafka.topic.transaction-accept}")
     private String transactionAcceptedTopic;
@@ -28,8 +39,9 @@ public class TransactionRegistrarServiceImpl implements RegistrarService<Transac
     private final AccountServiceImpl accountService;
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
+    private final AccountMapper accountMapper;
 
-    private final KafkaTransactionProducer<TransactionDto> producer;
+    private final KafkaJsonMessageProducer producer;
     private Map<UUID, Account> cache = new HashMap<>();
 
     @Transactional
@@ -47,8 +59,8 @@ public class TransactionRegistrarServiceImpl implements RegistrarService<Transac
         transactionList.stream()
                 .filter(transaction ->
                         accountService.findByUuid(transaction.getAccountUuid())
-                                      .getStatus()
-                                      .equals(AccountStatus.OPEN))
+                                .getStatus()
+                                .equals(AccountStatus.OPEN))
                 .forEach(transaction -> transaction.setStatus(TransactionStatus.REQUESTED));
 
 
@@ -58,15 +70,28 @@ public class TransactionRegistrarServiceImpl implements RegistrarService<Transac
 
         accounts.forEach(account -> cache.putIfAbsent(account.getAccountUuid(), account));
 
-        // handle Accounts balance
+        // handle Accounts balance & send message
         transactionList.forEach(transaction -> {
             // set new balance
             Account account = cache.get(transaction.getAccountUuid());
+            // !!! Transaction NOT check on non > 0 balance after !!!
             account.setBalance(account.getBalance().add(transaction.getAmount()));
             // messaging
-            producer.sendTo(transactionAcceptedTopic, transactionMapper.toDto(transaction));
+            Client client = account.getClient();
+            String message = buildJsonMessage(transaction, account, client);
+            producer.sendTo(transactionAcceptedTopic, message);
         });
 
         transactionRepository.saveAllAndFlush(transactionList);
+    }
+
+    private String buildJsonMessage(Transaction transaction, Account account, Client client) {
+        //{clientId, accountId, transactionId, timestamp, transaction.amount, account.balance}
+        return String.format("{%s, %s, %s, %s, %s, %s}", client.getClientUuid(),
+                                                         account.getAccountUuid(),
+                                                         transaction.getTransactionUuid(),
+                                                         transaction.getCreated(),
+                                                         transaction.getAmount(),
+                                                         account.getBalance());
     }
 }
