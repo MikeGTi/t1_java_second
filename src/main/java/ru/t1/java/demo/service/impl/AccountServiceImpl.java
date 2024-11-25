@@ -11,16 +11,13 @@ import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.dto.AccountDto;
 import ru.t1.java.demo.model.Account;
-import ru.t1.java.demo.model.dto.ClientDto;
 import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.ClientRepository;
 import ru.t1.java.demo.repository.TransactionRepository;
-import ru.t1.java.demo.service.AccountService;
 import ru.t1.java.demo.service.GenericService;
 import ru.t1.java.demo.service.ParserService;
-import ru.t1.java.demo.service.RegistrarService;
+import ru.t1.java.demo.service.HandleService;
 import ru.t1.java.demo.util.AccountMapper;
-import ru.t1.java.demo.util.ClientMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AccountServiceImpl implements GenericService<Account>, ParserService<Account>, RegistrarService<Account> {
+public class AccountServiceImpl implements GenericService<Account>, ParserService<Account>, HandleService<Account> {
 
     private final ClientRepository clientRepository;
     private final AccountRepository accountRepository;
@@ -69,7 +66,7 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
 
     @Transactional
     @Override
-    public void register(Iterable<Account> entities) {
+    public void handle(Iterable<Account> entities) {
         accountRepository.saveAllAndFlush(entities);
     }
 

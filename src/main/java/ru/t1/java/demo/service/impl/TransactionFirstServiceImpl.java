@@ -12,9 +12,7 @@ import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.enums.AccountStatus;
 import ru.t1.java.demo.model.enums.TransactionStatus;
 import ru.t1.java.demo.repository.TransactionRepository;
-import ru.t1.java.demo.service.RegistrarService;
-import ru.t1.java.demo.util.AccountMapper;
-import ru.t1.java.demo.util.TransactionMapper;
+import ru.t1.java.demo.service.HandleService;
 
 import java.util.*;
 
@@ -28,25 +26,20 @@ import java.util.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TransactionFirstServiceImpl implements RegistrarService<Transaction> {
-
-    @Value("${t1.kafka.topic.transaction-registration}")
-    private String transactionToRegistrationTopic;
+public class TransactionFirstServiceImpl implements HandleService<Transaction> {
 
     @Value("${t1.kafka.topic.transaction-accept}")
-    private String transactionAcceptedTopic;
+    private String topicToSend;
 
     private final AccountServiceImpl accountService;
     private final TransactionRepository transactionRepository;
-    private final TransactionMapper transactionMapper;
-    private final AccountMapper accountMapper;
 
     private final KafkaJsonMessageProducer producer;
     private Map<UUID, Account> cache = new HashMap<>();
 
     @Transactional
     @Override
-    public void register(Iterable<Transaction> entities) {
+    public void handle(Iterable<Transaction> entities) {
         // filter & set Transactions
         List<Transaction> transactionList = new ArrayList<>();
 
@@ -58,9 +51,9 @@ public class TransactionFirstServiceImpl implements RegistrarService<Transaction
 
         transactionList.stream()
                 .filter(transaction ->
-                        accountService.findByUuid(transaction.getAccountUuid())
-                                .getStatus()
-                                .equals(AccountStatus.OPEN))
+                            accountService.findByUuid(transaction.getAccountUuid())
+                                          .getStatus()
+                                          .equals(AccountStatus.OPEN))
                 .forEach(transaction -> transaction.setStatus(TransactionStatus.REQUESTED));
 
 
@@ -79,7 +72,7 @@ public class TransactionFirstServiceImpl implements RegistrarService<Transaction
             // messaging
             Client client = account.getClient();
             String message = buildJsonMessage(transaction, account, client);
-            producer.sendTo(transactionAcceptedTopic, message);
+            producer.sendTo(topicToSend, message);
         });
 
         transactionRepository.saveAllAndFlush(transactionList);

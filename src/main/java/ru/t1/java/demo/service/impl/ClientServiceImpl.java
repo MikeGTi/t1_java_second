@@ -14,7 +14,7 @@ import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.ClientRepository;
 import ru.t1.java.demo.service.ClientService;
 import ru.t1.java.demo.service.ParserService;
-import ru.t1.java.demo.service.RegistrarService;
+import ru.t1.java.demo.service.HandleService;
 import ru.t1.java.demo.util.ClientMapper;
 
 import java.io.File;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ClientServiceImpl implements ClientService, ParserService<Client>, RegistrarService<Client> {
+public class ClientServiceImpl implements ClientService, ParserService<Client>, HandleService<Client> {
 
     private final ClientRepository clientRepository;
     private final AccountRepository accountRepository;
@@ -60,7 +60,7 @@ public class ClientServiceImpl implements ClientService, ParserService<Client>, 
     }
 
     @Override
-    public void register(Iterable<Client> clients) {
+    public void handle(Iterable<Client> clients) {
         clientRepository.saveAllAndFlush(clients);
     }
 

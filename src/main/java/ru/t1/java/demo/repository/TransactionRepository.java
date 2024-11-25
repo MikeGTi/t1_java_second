@@ -6,6 +6,7 @@ import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.Transaction;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +20,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     List<Transaction> findAllTransactionsByAccount(Account account);
 
     List<Transaction> findAllTransactionsByClient(Client client);
+
+    List<Transaction> findAllTransactionsByCreatedBetween(LocalDateTime start, LocalDateTime end);
 
     @Override
     <S extends Transaction> List<S> saveAllAndFlush(Iterable<S> transactions);
