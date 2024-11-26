@@ -11,6 +11,7 @@ import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.enums.AccountStatus;
 import ru.t1.java.demo.model.enums.TransactionStatus;
+import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.TransactionRepository;
 import ru.t1.java.demo.service.HandleService;
 
@@ -31,51 +32,48 @@ public class TransactionFirstServiceImpl implements HandleService<Transaction> {
     @Value("${t1.kafka.topic.transaction-accept}")
     private String topicToSend;
 
-    private final AccountServiceImpl accountService;
+    private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
 
     private final KafkaJsonMessageProducer producer;
-    private Map<UUID, Account> cache = new HashMap<>();
+
 
     @Transactional
     @Override
     public void handle(Iterable<Transaction> entities) {
         // filter & set Transactions
-        List<Transaction> transactionList = new ArrayList<>();
 
         entities.forEach(transaction -> {
-            if(accountService.findByUuid(transaction.getAccountUuid()).getStatus().equals(AccountStatus.OPEN))  {
-                transactionList.add(transaction);
+            Account account = accountRepository.findByAccountUuid(transaction.getAccountUuid());
+            TransactionStatus transactionStatus = transaction.getStatus();
+
+            if (transactionStatus.equals(TransactionStatus.ACCEPTED)) {
+                transactionRepository.updateStatusByTransactionUuid(transaction.getTransactionUuid(), TransactionStatus.ACCEPTED);
+
+            } else if (transactionStatus.equals(TransactionStatus.BLOCKED)) {
+                transactionRepository.updateStatusByTransactionUuid(transaction.getTransactionUuid(), TransactionStatus.BLOCKED);
+                accountRepository.updateStatusByAccountUuid(transaction.getAccountUuid(), AccountStatus.BLOCKED);
+                // set new frozenAmount
+                account.setFrozenAmount(account.getBalance().add(transaction.getAmount()));
+                accountRepository.updateFrozenAmountByAccountUuid(account.getAccountUuid(), account.getFrozenAmount());
+
+            } else if (transactionStatus.equals(TransactionStatus.REJECTED)) {
+                transactionRepository.updateStatusByTransactionUuid(transaction.getTransactionUuid(), TransactionStatus.REJECTED);
+                // set new balance
+                account.setBalance(account.getBalance().add(transaction.getAmount()));
+                accountRepository.updateBalanceByAccountUuid(account.getAccountUuid(), account.getBalance());
+
+            } else if(account.getStatus().equals(AccountStatus.OPEN))  {
+                transaction.setStatus(TransactionStatus.REQUESTED);
+                transactionRepository.save(transaction);
+                // set new balance
+                account.setBalance(account.getBalance().add(transaction.getAmount()));
+                // messaging
+                Client client = account.getClient();
+                String message = buildJsonMessage(transaction, account, client);
+                producer.sendTo(topicToSend, message);
             }
         });
-
-        transactionList.stream()
-                .filter(transaction ->
-                            accountService.findByUuid(transaction.getAccountUuid())
-                                          .getStatus()
-                                          .equals(AccountStatus.OPEN))
-                .forEach(transaction -> transaction.setStatus(TransactionStatus.REQUESTED));
-
-
-        // collect Accounts
-        List<UUID> accountsUuids = transactionList.stream().map(Transaction::getAccountUuid).toList();
-        List<Account> accounts = accountsUuids.stream().map(accountService::findByUuid).toList();
-
-        accounts.forEach(account -> cache.putIfAbsent(account.getAccountUuid(), account));
-
-        // handle Accounts balance & send message
-        transactionList.forEach(transaction -> {
-            // set new balance
-            Account account = cache.get(transaction.getAccountUuid());
-            // !!! Transaction NOT check on non > 0 balance after !!!
-            account.setBalance(account.getBalance().add(transaction.getAmount()));
-            // messaging
-            Client client = account.getClient();
-            String message = buildJsonMessage(transaction, account, client);
-            producer.sendTo(topicToSend, message);
-        });
-
-        transactionRepository.saveAllAndFlush(transactionList);
     }
 
     private String buildJsonMessage(Transaction transaction, Account account, Client client) {
