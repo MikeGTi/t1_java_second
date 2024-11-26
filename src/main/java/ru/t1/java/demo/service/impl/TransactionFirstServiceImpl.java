@@ -15,7 +15,6 @@ import ru.t1.java.demo.repository.AccountRepository;
 import ru.t1.java.demo.repository.TransactionRepository;
 import ru.t1.java.demo.service.HandleService;
 
-import java.util.*;
 
 /**
  * Task 3 Service 1 (accounts cached):<p>
@@ -41,8 +40,7 @@ public class TransactionFirstServiceImpl implements HandleService<Transaction> {
     @Transactional
     @Override
     public void handle(Iterable<Transaction> entities) {
-        // filter & set Transactions
-
+        // filter & set Transactions, accounts
         entities.forEach(transaction -> {
             Account account = accountRepository.findByAccountUuid(transaction.getAccountUuid());
             TransactionStatus transactionStatus = transaction.getStatus();
