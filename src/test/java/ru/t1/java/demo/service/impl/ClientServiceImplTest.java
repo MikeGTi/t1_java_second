@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.t1.java.demo.model.dto.ClientDto;
+import ru.t1.java.demo.model.Client;
 
 import java.util.List;
 
@@ -29,18 +29,18 @@ class ClientServiceImplTest {
     @Test
     void parseJsonSpy() {
         when(clientService.parseJson())
-                .thenReturn(List.of(ClientDto.builder()
+                .thenReturn(List.of(Client.builder()
                         .build()));
 
-        assertEquals(List.of(ClientDto.builder().build()), clientService.parseJson());
+        assertEquals(List.of(Client.builder().build()), clientService.parseJson());
     }
 
     @Test
     void parseJsonMock() {
 
-        List<ClientDto> clients = List.of(ClientDto.builder()
+        List<Client> clients = List.of(Client.builder()
                 .firstName("first_name_1")
-                .build(), ClientDto.builder()
+                .build(), Client.builder()
                 .firstName("first_name_2")
                 .build());
 

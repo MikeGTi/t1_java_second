@@ -20,7 +20,7 @@ import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.util.backoff.FixedBackOff;
-import ru.t1.java.demo.kafka.KafkaClientProducer;
+import ru.t1.java.demo.kafka.producers.KafkaClientProducer;
 import ru.t1.java.demo.kafka.MessageDeserializer;
 import ru.t1.java.demo.model.dto.ClientDto;
 
@@ -108,9 +108,9 @@ public class DemoKafkaConfig<T> {
     @ConditionalOnProperty(value = "t1.kafka.producer.enable",
             havingValue = "true",
             matchIfMissing = true)
-    public KafkaClientProducer producerClient(@Qualifier("client") KafkaTemplate<String, ClientDto> template) {
+    public KafkaClientProducer<ClientDto> producerClient(@Qualifier("client") KafkaTemplate<String, ClientDto> template) {
         template.setDefaultTopic(clientTopic);
-        return new KafkaClientProducer(template);
+        return new KafkaClientProducer<>(template);
     }
 
     @Bean("producerClientFactory")

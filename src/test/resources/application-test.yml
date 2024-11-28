@@ -1,0 +1,10 @@
+spring:
+  liquibase:
+    enabled: true
+
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/t1_java_db"
+    username: "postgres"
+    password: "postgres"
+    hikari:
+      auto-commit: false

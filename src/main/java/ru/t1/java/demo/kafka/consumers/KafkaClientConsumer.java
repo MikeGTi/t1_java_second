@@ -38,7 +38,7 @@ public class KafkaClientConsumer {
                         return ClientMapper.toEntity(dto);
                     })
                     .toList();
-            clientServiceImpl.handle(clients);
+            clientServiceImpl.register(clients);
         } finally {
             ack.acknowledge();
         }

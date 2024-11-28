@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
-import ru.t1.java.demo.kafka.KafkaClientProducer;
+import ru.t1.java.demo.kafka.producers.KafkaClientProducer;
 import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.repository.ClientRepository;
 import ru.t1.java.demo.web.CheckWebClient;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -44,7 +45,7 @@ class ClientServiceIntegrationTest {
         client.setLastName("Doe");
 
         Client client2 = new Client();
-        client2.setId(422222L);
+        client2.setClientUuid(UUID.randomUUID());
         client2.setFirstName("John");
         client2.setLastName("Doe");
 
@@ -54,7 +55,7 @@ class ClientServiceIntegrationTest {
                 .when(kafkaClientProducer)
                 .send(anyLong());
 
-        List<Client> clients = clientService.registerClients(List.of(client));
+        List<Client> clients = clientService.register(List.of(client));
 
         assertThat(clients.get(0).getId()).isEqualTo(422222L);
 
