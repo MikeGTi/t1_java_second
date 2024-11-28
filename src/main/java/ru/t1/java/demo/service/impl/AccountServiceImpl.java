@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.t1.java.demo.aop.LogDataSourceError;
 import ru.t1.java.demo.exception.AccountException;
 import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.Transaction;
@@ -71,7 +70,6 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
     }
 
     @Transactional(readOnly = true)
-    @LogDataSourceError
     @Override
     public Account findById(Long accountId) throws AccountException {
         Optional<Account> account = Optional.of(accountRepository.findById(accountId));
@@ -82,7 +80,6 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
     }
 
     @Transactional(readOnly = true)
-    @LogDataSourceError
     @Override
     public Account findByUuid(UUID accountUuid) throws AccountException {
         Optional<Account> account = Optional.ofNullable(accountRepository.findByAccountUuid(accountUuid));
@@ -93,19 +90,16 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
     }
 
     @Transactional(readOnly = true)
-    @LogDataSourceError
     public List<Account> findAccountsByClientUuid(UUID clientUuid) {
         Client client = clientRepository.findByClientUuid(clientUuid);
         return accountRepository.findAllByClient(client);
     }
 
     @Transactional
-    @LogDataSourceError
     @Override
     public List<Account> findAll() { return accountRepository.findAll(); }
 
     @Transactional
-    @LogDataSourceError
     @Override
     public Account update(UUID uuid, Account entity) {
         Account updatedAccount = accountRepository.save(entity);
@@ -118,7 +112,6 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
     }
 
     @Transactional
-    @LogDataSourceError
     @Override
     public Account create(Account entity) {
         Account savedAccount = accountRepository.save(entity);
@@ -131,7 +124,6 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
     }
 
     @Transactional
-    @LogDataSourceError
     @Override
     public void delete(UUID accountUuid) throws AccountException {
         Optional<Account> account =  Optional.ofNullable(accountRepository.findByAccountUuid(accountUuid));
@@ -139,7 +131,6 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
     }
 
     @Transactional(readOnly = true)
-    @LogDataSourceError
     public List<Transaction> findAllTransactionsByAccountId(UUID accountUuid) throws AccountException{
         Optional<Account> account = Optional.ofNullable(accountRepository.findByAccountUuid(accountUuid));
         if (account.isEmpty()) {

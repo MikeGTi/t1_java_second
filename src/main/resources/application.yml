@@ -60,7 +60,7 @@ t1:
 
 track:
   errors-to-track: JsonParseException, IOException
-  method-execution-time-limit-ms: 500
+
 
 
   db:

@@ -1,7 +1,6 @@
 package ru.t1.java.demo.service;
 
 import org.springframework.transaction.annotation.Transactional;
-import ru.t1.java.demo.aop.LogDataSourceError;
 import ru.t1.java.demo.exception.TransactionException;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.dto.TransactionDto;

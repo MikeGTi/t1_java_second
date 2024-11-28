@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @Slf4j
-public class T1JavaDemoApplication {
+public class T1JavaSecondApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(T1JavaDemoApplication.class, args);
+        SpringApplication.run(T1JavaSecondApplication.class, args);
     }
 
 }

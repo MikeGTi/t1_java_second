@@ -5,10 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.t1.java.demo.aop.HandlingResult;
-import ru.t1.java.demo.aop.LogDataSourceError;
-import ru.t1.java.demo.aop.LogException;
-import ru.t1.java.demo.aop.Track;
 import ru.t1.java.demo.exception.TransactionException;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Transaction;
@@ -64,7 +60,6 @@ public class TransactionServiceImpl implements TransactionService, ParserService
     }
 
     @Transactional
-    @LogDataSourceError
     @Override
     public Transaction create(Transaction transaction) throws TransactionException {
         UUID accountUuid = transaction.getAccountUuid();
@@ -80,7 +75,6 @@ public class TransactionServiceImpl implements TransactionService, ParserService
     }
 
     @Transactional(readOnly = true)
-    @LogDataSourceError
     @Override
     public Transaction findByUuid(UUID transactionUuid) {
         Optional<Transaction> transaction = Optional.ofNullable(transactionRepository.findByTransactionUuid(transactionUuid));
@@ -92,15 +86,11 @@ public class TransactionServiceImpl implements TransactionService, ParserService
 
     @Override
     @Transactional(readOnly = true)
-    @LogException
-    @Track
-    @HandlingResult
     public List<Transaction> findAll() {
         return transactionRepository.findAll();
     }
 
     @Transactional
-    @LogDataSourceError
     @Override
     public Transaction update(UUID transactionUuid, TransactionDto transactionDto) throws TransactionException {
         Optional<Transaction> transactionToUpdate = Optional.ofNullable(transactionRepository.findByTransactionUuid(transactionUuid));
@@ -117,7 +107,6 @@ public class TransactionServiceImpl implements TransactionService, ParserService
     }
 
     @Transactional
-    @LogDataSourceError
     @Override
     public void delete(UUID transactionUuid) throws TransactionException {
         transactionRepository.delete(transactionRepository.findByTransactionUuid(transactionUuid));

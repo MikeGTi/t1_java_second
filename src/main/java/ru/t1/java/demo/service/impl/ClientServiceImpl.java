@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.t1.java.demo.aop.LogDataSourceError;
 import ru.t1.java.demo.exception.ClientException;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.dto.ClientDto;
@@ -74,7 +73,6 @@ public class ClientServiceImpl implements ClientService, ParserService<Client>, 
     }
 
     @Transactional(readOnly = true)
-    @LogDataSourceError
     @Override
     public Client findByClientUuid(UUID clientUuid) {
         Optional<Client> client = Optional.ofNullable(clientRepository.findByClientUuid(clientUuid));
@@ -85,7 +83,6 @@ public class ClientServiceImpl implements ClientService, ParserService<Client>, 
     }
 
     @Transactional(readOnly = true)
-    @LogDataSourceError
     @Override
     public Client findByAccountUuid(UUID accountUuid) {
         Optional<Client> client = Optional.ofNullable(clientRepository.findByClientUuid(accountUuid));
@@ -95,7 +92,6 @@ public class ClientServiceImpl implements ClientService, ParserService<Client>, 
         return client.get();
     }
 
-    @LogDataSourceError
     @Transactional(readOnly = true)
     @Override
     public List<Account> findAccountsByClientUuid(UUID clientUuid) throws ClientException{
@@ -118,14 +114,12 @@ public class ClientServiceImpl implements ClientService, ParserService<Client>, 
         return clientRepository.save(entity);
     }
 
-    @LogDataSourceError
     @Override
     public void deleteClient(UUID clientUuid) throws ClientException {
         Optional<Client> client = Optional.ofNullable(clientRepository.findByClientUuid(clientUuid));
         client.ifPresent(clientRepository::delete);
     }
 
-    @LogDataSourceError
     @Override
     public Client updateClient(UUID clientUuid, Client clientDto) throws ClientException{
         Optional<Client>  client = Optional.ofNullable(clientRepository.findByClientUuid(clientUuid));
