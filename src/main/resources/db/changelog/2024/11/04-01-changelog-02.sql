@@ -1,6 +1,6 @@
 -- liquibase formatted sql
 -- changeset update-client
-INSERT INTO client (client_uuid, first_name, last_name, middle_name) VALUES
+INSERT INTO client (id, first_name, last_name, middle_name) VALUES
                                                                 (1, 'Valenka', 'Tharme', 'Oralia'),
                                                                 (2, 'Tessie', 'Moring', 'Vidovic'),
                                                                 (3, 'Mandy', 'Bourges', 'Geneva'),

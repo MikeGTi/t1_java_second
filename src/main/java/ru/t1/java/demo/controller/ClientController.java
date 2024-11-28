@@ -5,18 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.t1.java.demo.aop.HandlingResult;
-import ru.t1.java.demo.aop.LogDataSourceError;
-import ru.t1.java.demo.aop.Track;
-import ru.t1.java.demo.aop.LogException;
 import ru.t1.java.demo.exception.ClientException;
 import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.dto.ClientDto;
 import ru.t1.java.demo.service.ClientService;
 import ru.t1.java.demo.util.ClientMapper;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,10 +49,10 @@ public class ClientController {
                                     HttpStatus.OK);
     }
 
-    @GetMapping("/{clientId}")
-    public ResponseEntity<ClientDto> getClientById(@PathVariable Long clientId) {
+    @GetMapping("/{clientUuid}")
+    public ResponseEntity<ClientDto> getClientById(@PathVariable UUID clientUuid) {
         try {
-            return new ResponseEntity<>(ClientMapper.toDto(clientService.findById(clientId)),
+            return new ResponseEntity<>(ClientMapper.toDto(clientService.findByClientUuid(clientUuid)),
                                         HttpStatus.OK);
             
         } catch (ClientException e) {
@@ -65,10 +61,10 @@ public class ClientController {
         }
     }
 
-    @PutMapping("/{clientId}")
-    public ResponseEntity<ClientDto> updateClient(@PathVariable Long clientId, @RequestBody ClientDto clientDto) {
+    @PutMapping("/{clientUuid}")
+    public ResponseEntity<ClientDto> updateClient(@PathVariable UUID clientUuid, @RequestBody ClientDto clientDto) {
         try {
-            Client updatedClient = clientService.updateClient(clientId, ClientMapper.toEntity(clientDto));
+            Client updatedClient = clientService.updateClient(clientUuid, ClientMapper.toEntity(clientDto));
             return new ResponseEntity<>(ClientMapper.toDto(updatedClient),
                                         HttpStatus.OK);
         } catch (ClientException e) {
@@ -78,10 +74,10 @@ public class ClientController {
         
     }
 
-    @DeleteMapping("/{clientId}")
-    public ResponseEntity<Void> deleteClient(@PathVariable Long clientId) {
+    @DeleteMapping("/{clientUuid}")
+    public ResponseEntity<Void> deleteClient(@PathVariable UUID clientUuid) {
         try {
-            clientService.delete(clientId);
+            clientService.deleteClient(clientUuid);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (ClientException e) {
             log.error(e.getMessage());

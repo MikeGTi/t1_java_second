@@ -4,6 +4,6 @@ import ru.t1.java.demo.model.Transaction;
 
 import java.util.List;
 
-public interface TransactionRegistrarService {
-    void register(List<Transaction> transactions);
+public interface RegistrarService<T> {
+    void register(Iterable<T> entities);
 }

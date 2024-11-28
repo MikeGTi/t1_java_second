@@ -10,7 +10,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import ru.t1.java.demo.model.Client;
 import ru.t1.java.demo.model.dto.ClientDto;
-import ru.t1.java.demo.service.ClientService;
+import ru.t1.java.demo.service.impl.ClientServiceImpl;
 import ru.t1.java.demo.util.ClientMapper;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.List;
 @Component
 public class KafkaClientConsumer {
 
-    private final ClientService clientService;
+    private final ClientServiceImpl clientServiceImpl;
 
     @KafkaListener(id = "${t1.kafka.topic.client-registration}",
                    topics = "${t1.kafka.topic.client-registration}",
@@ -38,7 +38,7 @@ public class KafkaClientConsumer {
                         return ClientMapper.toEntity(dto);
                     })
                     .toList();
-            clientService.registerClients(clients);
+            clientServiceImpl.register(clients);
         } finally {
             ack.acknowledge();
         }

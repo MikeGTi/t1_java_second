@@ -7,12 +7,16 @@ import ru.t1.java.demo.model.Client;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface ClientRepository extends JpaRepository<Client, Long> {
-    @Override
-    Optional<Client> findById(Long aLong);
+public interface ClientRepository extends JpaRepository<Client, UUID> {
+
+    Client findById(Long clientId);
+
+    Client findByClientUuid(UUID clientUuid);
 
     @Override
-    <S extends Client> List<S> saveAllAndFlush(Iterable<S> entities);
+    <S extends Client> List<S> saveAllAndFlush(Iterable<S> clients);
+
 }

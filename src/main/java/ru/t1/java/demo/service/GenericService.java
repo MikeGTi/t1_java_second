@@ -1,16 +1,19 @@
 package ru.t1.java.demo.service;
 
-import ru.t1.java.demo.model.Transaction;
-
-import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 public interface GenericService<T> {
+
+    T create(T entity);
+
     T findById(Long id);
+
+    T findByUuid(UUID uuid);
 
     List<T> findAll();
 
-    T save(T entity);
+    T update(UUID uuid, T entity);
 
-    void delete(Long id);
+    void delete(UUID uuid);
 }

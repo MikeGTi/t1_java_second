@@ -1,7 +1,6 @@
 package ru.t1.java.demo.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,16 +9,12 @@ import ru.t1.java.demo.aop.HandlingResult;
 import ru.t1.java.demo.aop.LogDataSourceError;
 import ru.t1.java.demo.aop.LogException;
 import ru.t1.java.demo.aop.Track;
-import ru.t1.java.demo.exception.AccountException;
-import ru.t1.java.demo.exception.ClientException;
 import ru.t1.java.demo.exception.TransactionException;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.dto.TransactionDto;
 import ru.t1.java.demo.repository.TransactionRepository;
-import ru.t1.java.demo.service.AccountService;
-import ru.t1.java.demo.service.GenericService;
-import ru.t1.java.demo.service.TransactionParserService;
+import ru.t1.java.demo.service.*;
 import ru.t1.java.demo.util.TransactionMapper;
 
 import java.io.File;
@@ -27,16 +22,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class TransactionServiceImpl implements GenericService<Transaction>, TransactionParserService {
+public class TransactionServiceImpl implements TransactionService, ParserService<Transaction>, RegistrarService<Transaction> {
 
     private final TransactionRepository transactionRepository;
-    private final AccountService accountService;
+    private final AccountServiceImpl accountServiceImpl;
     private final TransactionMapper transactionMapper;
 
     /*@PostConstruct
@@ -59,16 +55,38 @@ public class TransactionServiceImpl implements GenericService<Transaction>, Tran
                 TransactionDto[].class);
         return Arrays.stream(transactions)
                 .map(transactionMapper::toEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
+    @Transactional
     @Override
+    public void register(Iterable<Transaction> entities) {
+        transactionRepository.saveAllAndFlush(entities);
+    }
+
+    @Transactional
+    @LogDataSourceError
+    @Override
+    public Transaction create(Transaction transaction) throws TransactionException {
+        UUID accountUuid = transaction.getAccountUuid();
+        Optional<Account> account = Optional.ofNullable(accountServiceImpl.findByUuid(accountUuid));
+        if (account.isEmpty()) {
+            throw new TransactionException(String.format("Account with uud %s is not exists", accountUuid));
+        }
+        log.info("Balance of account uuid {} was {}", account.get().getAccountUuid(), account.get().getBalance());
+        log.info("New transaction has amount {}", transaction.getAmount());
+        account.get().setBalance(account.get().getBalance().add(transaction.getAmount()));
+        log.info("New balance of account uuid {} are {} ", account.get().getAccountUuid(), account.get().getBalance());
+        return transactionRepository.save(transaction);
+    }
+
     @Transactional(readOnly = true)
     @LogDataSourceError
-    public Transaction findById(Long id) {
-        Optional<Transaction> transaction = transactionRepository.findById(id);
+    @Override
+    public Transaction findByUuid(UUID transactionUuid) {
+        Optional<Transaction> transaction = Optional.ofNullable(transactionRepository.findByTransactionUuid(transactionUuid));
         if (transaction.isEmpty()) {
-            throw new TransactionException(String.format("Account with id %s is not exists", id));
+            throw new TransactionException(String.format("Account with uuid %s is not exists", transactionUuid));
         }
         return transaction.get();
     }
@@ -83,43 +101,27 @@ public class TransactionServiceImpl implements GenericService<Transaction>, Tran
     }
 
     @Transactional
+    @LogDataSourceError
     @Override
-    public Transaction save(Transaction entity) {
-        return transactionRepository.save(entity);
-    }
-
-    @Override
-    @LogDataSourceError
-    public void delete(Long id) throws TransactionException {
-        transactionRepository.delete(findById(id));
-    }
-
-    @Transactional
-    @LogDataSourceError
-    public Transaction addTransaction(Transaction transaction) throws AccountException {
-        Account account = accountService.findById(transaction.getAccountUuid());
-        log.info("Balance of account id {} was {}", account.getAccountUuid(), account.getBalance());
-        log.info("New transaction has amount {}", transaction.getAmount());
-        account.setBalance(account.getBalance().add(transaction.getAmount()));
-        log.info("New balance of account id {} are {} ", account.getAccountUuid(), account.getBalance());
-        return transactionRepository.save(transaction);
-    }
-
-    @Transactional
-    @LogDataSourceError
-    public Transaction updateTransaction(Long transactionId, TransactionDto transactionDto) throws TransactionException, ClientException {
-        Optional<Transaction> transactionToUpdate = transactionRepository.findById(transactionId);
+    public Transaction update(UUID transactionUuid, TransactionDto transactionDto) throws TransactionException {
+        Optional<Transaction> transactionToUpdate = Optional.ofNullable(transactionRepository.findByTransactionUuid(transactionUuid));
         if (transactionToUpdate.isEmpty()) {
-            throw new TransactionException(String.format("Transaction with id %s is not exists", transactionId));
+            throw new TransactionException(String.format("Transaction with uuid %s is not exists", transactionUuid));
         }
-
-        Account account = accountService.findById(transactionToUpdate.get().getAccountUuid());
+        Account account = accountServiceImpl.findByUuid(transactionToUpdate.get().getAccountUuid());
 
         transactionToUpdate.get().setAmount(transactionDto.getAmount());
-        transactionToUpdate.get().setTime(transactionDto.getTimestamp());
+        transactionToUpdate.get().setCreated(transactionDto.getCreated());
         transactionToUpdate.get().setAccount(account);
 
         return transactionRepository.save(transactionToUpdate.get());
+    }
+
+    @Transactional
+    @LogDataSourceError
+    @Override
+    public void delete(UUID transactionUuid) throws TransactionException {
+        transactionRepository.delete(transactionRepository.findByTransactionUuid(transactionUuid));
     }
 }
 

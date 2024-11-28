@@ -12,6 +12,7 @@ import ru.t1.java.demo.repository.ClientRepository;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -21,10 +22,10 @@ public class AccountMapper {
     private final TransactionMapper transactionMapper;
 
     public Account toEntity(AccountDto dto) throws ClientException {
-        Long clientUuid = dto.getClientUuid();
+        UUID clientUuid = dto.getClientUuid();
         Optional<Client> client = clientRepository.findById(clientUuid);
         if (client.isEmpty()) {
-            throw new ClientException(String.format("Client with id %s is not exists", clientUuid));
+            throw new ClientException(String.format("Client with uuid %s is not exists", clientUuid));
         }
         Account account = Account.builder()
                 .accountUuid(dto.getAccountUuid())

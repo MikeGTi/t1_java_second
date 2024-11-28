@@ -27,7 +27,7 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountDto implements Serializable {
     @JsonProperty("account_uuid")
-    Long accountUuid;
+    UUID accountUuid;
 
     @JsonProperty("client_uuid")
     UUID clientUuid;
