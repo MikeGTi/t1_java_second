@@ -28,6 +28,12 @@ public class Client extends AbstractPersistable<Long> {
     @Column(name = "middle_name")
     private String middleName;
 
+    @Column(name = "blocked_for")
+    private Boolean blockedFor;
+
+    @Column(name = "blocked_whom")
+    private String blockedWhom;
+
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Account> accounts;
 

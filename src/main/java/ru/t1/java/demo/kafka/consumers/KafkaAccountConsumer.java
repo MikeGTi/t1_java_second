@@ -33,7 +33,7 @@ public class KafkaAccountConsumer {
             List<Account> accounts = messageList.stream()
                                                 .map(accountMapper::toEntity)
                                                 .toList();
-            accountServiceImpl.register(accounts);
+            accountServiceImpl.handle(accounts);
         } finally {
             ack.acknowledge();
         }

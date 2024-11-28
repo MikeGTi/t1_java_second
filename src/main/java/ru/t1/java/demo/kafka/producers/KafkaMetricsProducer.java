@@ -27,7 +27,7 @@ public class KafkaMetricsProducer<T extends MetricStatisticDto> {
     @Value("${t1.kafka.topic.header.methods-metric-header}")
     private String header;
 
-    public void send(ru.t1.java.demo.model.dto.MetricStatisticDto metricStatisticDto) {
+    public void send(T metricStatisticDto) {
         try {
             List<Header> headers = List.of(new RecordHeader(header, header.getBytes(StandardCharsets.UTF_8)));
             ProducerRecord<String, MetricStatisticDto> record = new ProducerRecord<>(topic,

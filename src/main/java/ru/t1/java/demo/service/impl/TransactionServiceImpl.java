@@ -23,13 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
-public class TransactionServiceImpl implements TransactionService, ParserService<Transaction>, RegistrarService<Transaction> {
+public class TransactionServiceImpl implements TransactionService, ParserService<Transaction>, HandleService<Transaction> {
 
     private final TransactionRepository transactionRepository;
     private final AccountServiceImpl accountServiceImpl;
@@ -60,7 +59,7 @@ public class TransactionServiceImpl implements TransactionService, ParserService
 
     @Transactional
     @Override
-    public void register(Iterable<Transaction> entities) {
+    public void handle(Iterable<Transaction> entities) {
         transactionRepository.saveAllAndFlush(entities);
     }
 

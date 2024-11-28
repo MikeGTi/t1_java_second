@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1732696558355-13" author="mboychook">
+        <createSequence incrementBy="50" sequenceName="role_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1732696558355-14" author="mboychook">
+        <createSequence incrementBy="50" sequenceName="tbl_transaction_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1732696558355-15" author="mboychook">
+        <createSequence incrementBy="50" sequenceName="users_seq" startValue="1"/>
+    </changeSet>
+    <changeSet id="1732696558355-16" author="mboychook">
+        <createTable tableName="role">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_role"/>
+            </column>
+            <column name="name" type="VARCHAR(20)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1732696558355-17" author="mboychook">
+        <createTable tableName="user_roles">
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user_roles"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user_roles"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="1732696558355-18" author="mboychook">
+        <createTable tableName="users">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
+            </column>
+            <column name="login" type="VARCHAR(20)"/>
+            <column name="email" type="VARCHAR(50)"/>
+            <column name="password" type="VARCHAR(120)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1732696558355-19" author="mboychook">
+        <addColumn tableName="client">
+            <column name="blocked_for" type="BOOLEAN"/>
+            <column name="blocked_whom" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1732696558355-21" author="mboychook">
+        <addUniqueConstraint columnNames="email" constraintName="uc_74165e195b2f7b25de690d14a" tableName="users"/>
+    </changeSet>
+    <changeSet id="1732696558355-22" author="mboychook">
+        <addUniqueConstraint columnNames="login" constraintName="uc_f8d2576e807e2b20b506bf6a3" tableName="users"/>
+    </changeSet>
+    <changeSet id="1732696558355-23" author="mboychook">
+        <addForeignKeyConstraint baseColumnNames="role_id" baseTableName="user_roles" constraintName="fk_userol_on_role"
+                                 referencedColumnNames="id" referencedTableName="role"/>
+    </changeSet>
+    <changeSet id="1732696558355-24" author="mboychook">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_roles" constraintName="fk_userol_on_user"
+                                 referencedColumnNames="id" referencedTableName="users"/>
+    </changeSet>
+    <changeSet id="1732696558355-25" author="mboychook">
+        <dropSequence sequenceName="transaction_seq"/>
+    </changeSet>
+    <changeSet id="1732696558355-1" author="mboychook">
+        <modifyDataType columnName="account_type" newDataType="VARCHAR(255)" tableName="account"/>
+    </changeSet>
+    <changeSet id="1732696558355-2" author="mboychook">
+        <modifyDataType columnName="first_name" newDataType="VARCHAR(255)" tableName="client"/>
+    </changeSet>
+    <changeSet id="1732696558355-3" author="mboychook">
+        <modifyDataType columnName="last_name" newDataType="VARCHAR(255)" tableName="client"/>
+    </changeSet>
+    <changeSet id="1732696558355-4" author="mboychook">
+        <modifyDataType columnName="message" newDataType="VARCHAR(255)" tableName="data_source_error_log"/>
+    </changeSet>
+    <changeSet id="1732696558355-5" author="mboychook">
+        <modifyDataType columnName="method_signature" newDataType="VARCHAR(255)" tableName="data_source_error_log"/>
+    </changeSet>
+    <changeSet id="1732696558355-6" author="mboychook">
+        <modifyDataType columnName="middle_name" newDataType="VARCHAR(255)" tableName="client"/>
+    </changeSet>
+    <changeSet id="1732696558355-7" author="mboychook">
+        <dropColumn columnName="status" tableName="account"/>
+    </changeSet>
+    <changeSet id="1732696558355-8" author="mboychook">
+        <addColumn tableName="account">
+            <column name="status" type="SMALLINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="1732696558355-9" author="mboychook">
+        <dropNotNullConstraint columnDataType="smallint" columnName="status" tableName="account"/>
+    </changeSet>
+    <changeSet id="1732696558355-10" author="mboychook">
+        <modifyDataType columnName="status" newDataType="VARCHAR(255)" tableName="tbl_transaction"/>
+    </changeSet>
+    <changeSet id="1732696558355-11" author="mboychook">
+        <dropNotNullConstraint columnDataType="varchar(255)" columnName="status" tableName="tbl_transaction"/>
+    </changeSet>
+    <changeSet id="1732696558355-12" author="mboychook">
+        <modifyDataType columnName="trace" newDataType="VARCHAR(255)" tableName="data_source_error_log"/>
+    </changeSet>
+
+</databaseChangeLog>
