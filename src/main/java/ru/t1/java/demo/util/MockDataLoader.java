@@ -26,7 +26,6 @@ import java.util.stream.IntStream;
 public class MockDataLoader {
 
     private final ClientRepository clientRepository;
-    private final DataSourceErrorLogRepository dataSourceErrorLogRepository;
 
     @Value("${t1.mock-data.add-objects-counter}")
     private Integer counter;
@@ -73,15 +72,6 @@ public class MockDataLoader {
                                                                       .forEach(transaction -> transaction.setAccount(account));
                                                            }));
         clientRepository.saveAll(clients);
-        IntStream.range(0, counter)
-                 .forEach(i -> dataSourceErrorLogRepository.save(generateDataSourceErrorLog()));
     }
 
-    public DataSourceErrorLog generateDataSourceErrorLog() {
-        DataSourceErrorLog errorLog = new DataSourceErrorLog();
-                           errorLog.setMethodSignature("ru.t1.example.anyService.methodWithError");
-                           errorLog.setMessage("Any type error");
-                           errorLog.setStackTrace("Stack trace of the error");
-                    return errorLog;
-    }
 }

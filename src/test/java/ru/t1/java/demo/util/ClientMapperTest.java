@@ -35,9 +35,9 @@ class ClientMapperTest {
 
         doReturn(client)
                 .when(mapper)
-                .toEntityWithId(dto);
+                .toEntityWithGeneratedUuid(dto);
 
-        assertThat(mapper.toEntityWithId(dto)).isEqualTo(client);
+        assertThat(mapper.toEntityWithGeneratedUuid(dto)).isEqualTo(client);
 
 
     }

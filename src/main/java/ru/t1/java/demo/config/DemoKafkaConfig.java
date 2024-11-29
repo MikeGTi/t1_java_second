@@ -1,3 +1,4 @@
+/*
 package ru.t1.java.demo.config;
 
 import lombok.extern.slf4j.Slf4j;
@@ -125,4 +126,4 @@ public class DemoKafkaConfig<T> {
         return new DefaultKafkaProducerFactory<>(props);
     }
 
-}
+}*/

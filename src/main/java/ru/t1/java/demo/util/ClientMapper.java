@@ -5,6 +5,8 @@ import ru.t1.java.demo.exception.ClientException;
 import ru.t1.java.demo.model.dto.ClientDto;
 import ru.t1.java.demo.model.Client;
 
+import java.util.UUID;
+
 @Component
 public class ClientMapper {
 
@@ -29,5 +31,27 @@ public class ClientMapper {
                 .middleName(entity.getMiddleName())
                 .build();
     }
+
+    public static Client toEntityWithGeneratedUuid(ClientDto dto) {
+        if (dto.getFirstName() == null ||
+                dto.getLastName() == null) {
+            throw new ClientException("Client first/last name is required");
+        }
+        return Client.builder()
+                .clientUuid(UUID.randomUUID())
+                .firstName(dto.getFirstName())
+                .lastName(dto.getLastName())
+                .middleName(dto.getMiddleName())
+                .build();
+    }
+
+    /*public static ClientDto toDtoWithUuid(Client entity) {
+        return ClientDto.builder()
+                .clientUuid(entity.getClientUuid())
+                .firstName(entity.getFirstName())
+                .lastName(entity.getLastName())
+                .middleName(entity.getMiddleName())
+                .build();
+    }*/
 
 }
