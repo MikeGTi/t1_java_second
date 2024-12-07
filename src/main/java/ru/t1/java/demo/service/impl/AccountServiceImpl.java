@@ -71,16 +71,6 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
 
     @Transactional(readOnly = true)
     @Override
-    public Account findById(Long accountId) throws AccountException {
-        Optional<Account> account = Optional.of(accountRepository.findById(accountId));
-        if (account.isEmpty()) {
-            throw new AccountException(String.format("Account with uuid %s is not exists", accountId));
-        }
-        return account.get();
-    }
-
-    @Transactional(readOnly = true)
-    @Override
     public Account findByUuid(UUID accountUuid) throws AccountException {
         Optional<Account> account = Optional.ofNullable(accountRepository.findByAccountUuid(accountUuid));
         if (account.isEmpty()) {
@@ -97,7 +87,9 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
 
     @Transactional
     @Override
-    public List<Account> findAll() { return accountRepository.findAll(); }
+    public List<Account> findAll() {
+        return accountRepository.findAll();
+    }
 
     @Transactional
     @Override
@@ -131,7 +123,7 @@ public class AccountServiceImpl implements GenericService<Account>, ParserServic
     }
 
     @Transactional(readOnly = true)
-    public List<Transaction> findAllTransactionsByAccountId(UUID accountUuid) throws AccountException{
+    public List<Transaction> findAllTransactionsByAccountId(UUID accountUuid) throws AccountException {
         Optional<Account> account = Optional.ofNullable(accountRepository.findByAccountUuid(accountUuid));
         if (account.isEmpty()) {
             throw new AccountException(String.format("Account with uuid %s is not exists", accountUuid));

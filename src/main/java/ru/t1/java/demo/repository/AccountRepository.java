@@ -7,13 +7,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.t1.java.demo.model.Account;
 import ru.t1.java.demo.model.Client;
-import ru.t1.java.demo.model.Transaction;
 import ru.t1.java.demo.model.enums.AccountStatus;
-import ru.t1.java.demo.model.enums.TransactionStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository

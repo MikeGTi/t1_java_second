@@ -45,8 +45,7 @@ public class TransactionSecondServiceImpl implements HandleService<Transaction> 
     @Override
     public void handle(Iterable<Transaction> entities) {
         // set Transaction status
-        entities.forEach(transaction ->
-            {
+        entities.forEach(transaction -> {
                  BigDecimal balance = transaction.getAccount().getBalance();
                  List<Transaction> list = transactionRepository.findAllTransactionsByCreatedBetween(transaction.getCreated().minus(blockPeriod),
                                                                                                     transaction.getCreated());

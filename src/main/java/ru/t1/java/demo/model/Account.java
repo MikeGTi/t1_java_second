@@ -52,5 +52,4 @@ public class Account extends AbstractPersistable<Long> {
         transactions.remove(transaction);
         transaction.setAccount(null);
     }
-    
 }

@@ -26,7 +26,6 @@ public class TransactionController {
 
     private final TransactionServiceImpl transactionServiceImpl;
     private final AccountServiceImpl accountService;
-    
     private final TransactionMapper transactionMapper;
 
     /*//@LogException

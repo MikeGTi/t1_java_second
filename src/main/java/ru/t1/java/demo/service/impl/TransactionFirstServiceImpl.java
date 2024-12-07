@@ -61,7 +61,7 @@ public class TransactionFirstServiceImpl implements HandleService<Transaction> {
                 account.setBalance(account.getBalance().add(transaction.getAmount()));
                 accountRepository.updateBalanceByAccountUuid(account.getAccountUuid(), account.getBalance());
 
-            } else if(account.getStatus().equals(AccountStatus.OPEN))  {
+            } else if (account.getStatus().equals(AccountStatus.OPEN))  {
                 transaction.setStatus(TransactionStatus.REQUESTED);
                 transactionRepository.save(transaction);
                 // set new balance

@@ -9,27 +9,19 @@ import java.util.UUID;
 
 public interface AccountService {
 
-
     List<Account> parseJson() throws IOException;
 
-    @Transactional
     void register(List<Account> accounts);
 
-    @Transactional(readOnly = true)
     Account getAccountsByAccountUuid(UUID accountUuid);
 
-    @Transactional(readOnly = true)
     List<Account> getAccountsByClientUuid(UUID clientUuid);
 
-    @Transactional(readOnly = true)
     List<Account> getAccountsByAccountUuid(List<UUID> accountUuids);
 
-    @Transactional(readOnly = true)
     List<Account> findAll();
 
-    @Transactional
     Account save(Account entity);
 
-    @Transactional
-    void delete(UUID account_uuid) throws AccountException;
+    void delete(UUID accountUuid) throws AccountException;
 }

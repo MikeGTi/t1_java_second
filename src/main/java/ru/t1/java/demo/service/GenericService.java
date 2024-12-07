@@ -7,8 +7,6 @@ public interface GenericService<T> {
 
     T create(T entity);
 
-    T findById(Long id);
-
     T findByUuid(UUID uuid);
 
     List<T> findAll();

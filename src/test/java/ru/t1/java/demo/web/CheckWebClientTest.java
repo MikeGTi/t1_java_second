@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.t1.java.demo.model.dto.CheckResponse;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -20,13 +21,13 @@ class CheckWebClientTest {
 
     @Test
     void check() {
-
-        when(checkWebClient.check(1L))
+        UUID uuid = UUID.fromString("770dd3ef-fa3b-4c35-9ec0-e07dff3811c3");
+        when(checkWebClient.check(uuid))
                 .thenReturn(Optional.of(CheckResponse.builder()
                 .blocked(false)
                 .build()));
 
-        assertThat(checkWebClient.check(1L).get())
+        assertThat(checkWebClient.check(uuid).get())
                 .isEqualTo(CheckResponse.builder()
                         .blocked(false)
                         .build());

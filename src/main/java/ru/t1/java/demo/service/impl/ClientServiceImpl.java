@@ -94,7 +94,7 @@ public class ClientServiceImpl implements ClientService, ParserService<Client>, 
 
     @Transactional(readOnly = true)
     @Override
-    public List<Account> findAccountsByClientUuid(UUID clientUuid) throws ClientException{
+    public List<Account> findAccountsByClientUuid(UUID clientUuid) throws ClientException {
         Client client = clientRepository.findByClientUuid(clientUuid);
         return accountRepository.findAllByClient(client);
     }
@@ -121,9 +121,9 @@ public class ClientServiceImpl implements ClientService, ParserService<Client>, 
     }
 
     @Override
-    public Client updateClient(UUID clientUuid, Client clientDto) throws ClientException{
+    public Client updateClient(UUID clientUuid, Client clientDto) throws ClientException {
         Optional<Client>  client = Optional.ofNullable(clientRepository.findByClientUuid(clientUuid));
-        if(client.isEmpty()) {
+        if (client.isEmpty()) {
             throw new ClientException(String.format("Client with uuid %s is not exists", clientUuid));
         }
 

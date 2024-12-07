@@ -8,9 +8,6 @@
     <changeSet id="1732696558355-13" author="mboychook">
         <createSequence incrementBy="50" sequenceName="role_seq" startValue="1"/>
     </changeSet>
-    <changeSet id="1732696558355-14" author="mboychook">
-        <createSequence incrementBy="50" sequenceName="tbl_transaction_seq" startValue="1"/>
-    </changeSet>
     <changeSet id="1732696558355-15" author="mboychook">
         <createSequence incrementBy="50" sequenceName="users_seq" startValue="1"/>
     </changeSet>
@@ -61,9 +58,6 @@
     <changeSet id="1732696558355-24" author="mboychook">
         <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="user_roles" constraintName="fk_userol_on_user"
                                  referencedColumnNames="id" referencedTableName="users"/>
-    </changeSet>
-    <changeSet id="1732696558355-25" author="mboychook">
-        <dropSequence sequenceName="transaction_seq"/>
     </changeSet>
     <changeSet id="1732696558355-1" author="mboychook">
         <modifyDataType columnName="account_type" newDataType="VARCHAR(255)" tableName="account"/>

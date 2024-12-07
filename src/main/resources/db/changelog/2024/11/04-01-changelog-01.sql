@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS tbl_transaction (
     client_id BIGINT REFERENCES client (id),
     account_id BIGINT REFERENCES account (id),
     amount DECIMAL(19,2),
-    created TIMESTAMPTZ,
+    created TIMESTAMPTZ NOT NULL,
     status VARCHAR(16) NOT NULL
 );
 
@@ -46,5 +46,6 @@ CREATE TABLE IF NOT EXISTS data_source_error_log (
    CONSTRAINT pk_data_source_error_log PRIMARY KEY (id),
    trace VARCHAR,
    message VARCHAR,
-   method_signature VARCHAR
+   method_signature VARCHAR,
+   created TIMESTAMPTZ NOT NULL
 );

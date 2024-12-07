@@ -8,6 +8,7 @@ import ru.t1.java.demo.model.dto.CheckRequest;
 import ru.t1.java.demo.model.dto.CheckResponse;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 public class CheckWebClient extends BaseWebClient {
@@ -19,12 +20,12 @@ public class CheckWebClient extends BaseWebClient {
         super(webClient);
     }
 
-    public Optional<CheckResponse> check(Long id) {
-        log.debug("Старт запроса с id {}", id);
+    public Optional<CheckResponse> check(UUID uuid) {
+        log.debug("Старт запроса с uuid {}", uuid);
         ResponseEntity<CheckResponse> post;
         try {
             CheckRequest request = CheckRequest.builder()
-                    .clientId(id)
+                    .clientUuid(uuid)
                     .build();
 
             post = this.post(
@@ -37,7 +38,7 @@ public class CheckWebClient extends BaseWebClient {
             throw httpStatusException;
         }
 
-        log.debug("Финиш запроса с id {}", id);
+        log.debug("Финиш запроса с uuid {}", uuid);
         return Optional.ofNullable(post.getBody());
     }
 }
